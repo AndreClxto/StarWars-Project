@@ -1,5 +1,9 @@
 <?php
 
+namespace Models;
+
+use DateTime;
+
 class Movie {
     public $title;
     public $episode_id;
@@ -51,32 +55,3 @@ class Movie {
         return $characterNames;
     }
 }
-
-$url = 'https://swapi.py4e.com/api/films/3/';
-
-// Fetch the data from the API using cURL
-$jsonData =>fetchDataFromApi($url);
-
-// Transformando a informacao recebida em json para codigo php
-$data = json_decode($jsonData, true);
-
-// Create a Movie object using the fetched data
-$movie = new Movie($data);
-
-// Get the movie's age
-$age = $movie->calculateAge();
-
-// Format the opening crawl text for HTML output
-$openingCrawl = $movie->formattedOpeningCrawl(); 
-
-// Lista de personagens em formato apresentável
-$characterList = $movie->formatCharacterNames();
-
-echo "Título: " . $movie->title . "<br>";
-echo "Episódio: " . $movie->episode_id . "<br>";
-echo "Diretor: " . $movie->director . "<br>";
-echo "Produtor(es): " . implode(', ', $movie->producers) . "<br>";
-echo "Data de Lançamento: " . $movie->release_date . "<br>";
-echo "<h3>Sinópse:</h3>" . $openingCrawl . "<br><br>";
-echo "<h4>Personagens:</h4>" . implode(';<br>' , $characterList) . "<br><br>";
-echo "<h4>Idade do Filme:</h4> " . $age['years'] . " anos, " . $age['months'] . " meses, e " . $age['days'] . " dias<br>";

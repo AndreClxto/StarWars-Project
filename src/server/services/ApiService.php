@@ -1,5 +1,7 @@
 <?php
 
+    namespace Services;
+
     class ApiService {
         public static function fetchDataFromApi($url) {
             $ch = curl_init();
