@@ -18,6 +18,13 @@
                 $movies[] = new Movie($movieData);
             }
 
+            usort($movies, function ($a, $b) {
+                $dateA = new \DateTime($a->release_date);
+                $dateB = new \DateTime($b->release_date);
+            
+                return $dateA <=> $dateB; // Compare dates in ascending order
+            });
+
             include_once __DIR__ . '/../view/catalogs.php';
         }
 

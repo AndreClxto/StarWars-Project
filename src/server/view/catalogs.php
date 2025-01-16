@@ -11,7 +11,7 @@
         <?php foreach ($movies as $movie): ?>
             <li>
                 <a href="index.php?action=details&id=<?= $movie->episode_id; ?>">
-                    <?= $movie->title; ?> (<?= $movie->release_date; ?>)
+                    <?= $movie->title; ?> (<?= $movie->calculateAge()['formatted_date']; ?>)
                 </a>
             </li>
         <?php endforeach; ?>

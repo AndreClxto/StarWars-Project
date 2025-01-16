@@ -28,7 +28,9 @@ class Movie {
         $releaseDate = new DateTime($this->release_date); 
         $now = new DateTime();
         $interval = $releaseDate -> diff($now);
+        $formattedDate = $releaseDate->format('d/m/Y');
         return [
+            'formatted_date' => $formattedDate,
             'days' => $interval->d,
             'months' => $interval->m,
             'years' => $interval->y
