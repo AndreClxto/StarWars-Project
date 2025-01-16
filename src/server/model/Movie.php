@@ -24,9 +24,9 @@ class Movie {
         $now = new DateTime();
         $interval = $releaseDate -> diff($now);
         return [
-            'years' => $interval->y,
+            'days' => $interval->d,
             'months' => $interval->m,
-            'days' => $interval->d
+            'years' => $interval->y
         ];
     }
 
@@ -52,34 +52,10 @@ class Movie {
     }
 }
 
-
-
-// A partir daqui tem q ser em outro lugar. Mas por enquanto vai ficar por aqui msm.
-
-function fetchDataFromApi($url) {
-    $ch = curl_init();
-
-    curl_setopt($ch, CURLOPT_URL, $url);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-    curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true); 
-    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-
-    $response = curl_exec($ch);
-
-    if(curl_errno($ch)) {
-        echo 'cURL Error: ' . curl_error($ch);
-        return null;
-    }
-
-    curl_close($ch);
-
-    return $response;
-}
-
-$url = 'https://swapi.py4e.com/api/films/2/';
+$url = 'https://swapi.py4e.com/api/films/3/';
 
 // Fetch the data from the API using cURL
-$jsonData = fetchDataFromApi($url);
+$jsonData =>fetchDataFromApi($url);
 
 // Transformando a informacao recebida em json para codigo php
 $data = json_decode($jsonData, true);
