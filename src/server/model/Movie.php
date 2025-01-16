@@ -2,6 +2,7 @@
 
 namespace Models;
 
+use Services\ApiService;
 use DateTime;
 
 class Movie {
@@ -43,7 +44,7 @@ class Movie {
     
         foreach ($this->characters as $url) {
             // Fetch character details from the API
-            $characterDataJson = fetchDataFromApi($url);
+            $characterDataJson = ApiService::fetchDataFromApi($url);
             // Decode the JSON data
             $characterData = json_decode($characterDataJson, true);
             // Extract the name and add it to the array

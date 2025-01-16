@@ -20,6 +20,15 @@
 
             include_once __DIR__ . '/../view/catalogs.php';
         }
-        
+
+        public function showDetails($id) {
+            $url = "https://swapi.py4e.com/api/films/$id/";
+            $jsonData = ApiService::fetchDataFromApi($url);
+            $data = json_decode($jsonData, true);
+    
+            $movie = new Movie($data);
+    
+            include __DIR__ . '/../view/details.php';
+        }
 
     }
