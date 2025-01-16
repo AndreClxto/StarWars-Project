@@ -30,9 +30,25 @@ class Movie {
         ];
     }
 
-    public function formattedOpeningCrawl()
-    {
+    public function formattedOpeningCrawl() {
         return nl2br($this->opening_crawl); // Converte as quebras de linha em tags <br> para melhor manuseio.
+    }
+
+    public function formatCharacterNames() {
+        $characterNames = []; // Initialize an array to store character names
+    
+        foreach ($this->characters as $url) {
+            // Fetch character details from the API
+            $characterDataJson = fetchDataFromApi($url);
+            // Decode the JSON data
+            $characterData = json_decode($characterDataJson, true);
+            // Extract the name and add it to the array
+            if (isset($characterData['name'])) {
+                $characterNames[] = $characterData['name'];
+            }
+        }
+
+        return $characterNames;
     }
 }
 
@@ -77,10 +93,14 @@ $age = $movie->calculateAge();
 // Format the opening crawl text for HTML output
 $openingCrawl = $movie->formattedOpeningCrawl(); 
 
+// Lista de personagens em formato apresentável
+$characterList = $movie->formatCharacterNames();
+
 echo "Título: " . $movie->title . "<br>";
 echo "Episódio: " . $movie->episode_id . "<br>";
 echo "Diretor: " . $movie->director . "<br>";
 echo "Produtor(es): " . implode(', ', $movie->producers) . "<br>";
 echo "Data de Lançamento: " . $movie->release_date . "<br>";
 echo "<h3>Sinópse:</h3>" . $openingCrawl . "<br><br>";
-echo "Idade do Filme: " . $age['years'] . " years, " . $age['months'] . " months, and " . $age['days'] . " days<br>";
+echo "<h4>Personagens:</h4>" . implode(';<br>' , $characterList) . "<br><br>";
+echo "<h4>Idade do Filme:</h4> " . $age['years'] . " anos, " . $age['months'] . " meses, e " . $age['days'] . " dias<br>";
