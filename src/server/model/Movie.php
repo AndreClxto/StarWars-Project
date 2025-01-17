@@ -3,6 +3,7 @@
 namespace Models;
 
 use Services\ApiService;
+use Services\DataBaseHandler;
 use DateTime;
 
 class Movie {
@@ -43,7 +44,7 @@ class Movie {
 
     public function formatCharacterNames() {
         $characterNames = []; // Initialize an array to store character names
-    
+         
         foreach ($this->characters as $url) {
             // Fetch character details from the API
             $characterDataJson = ApiService::fetchDataFromApi($url);
