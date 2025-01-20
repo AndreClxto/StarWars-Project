@@ -2,9 +2,9 @@
 
     use Controllers\MovieController;
 
-    require __DIR__ . '/server/controller/MovieController.php';
-    require __DIR__ . '/server/model/Movie.php';
-    require __DIR__ . '/server/services/ApiService.php';
+    require __DIR__ . '/controller/MovieController.php';
+    require __DIR__ . '/model/Movie.php';
+    require __DIR__ . '/services/ApiService.php';
 
     $action = $_GET['action'] ?? 'catalog';
     $id = $_GET['id'] ?? null;

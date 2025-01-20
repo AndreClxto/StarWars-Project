@@ -41,21 +41,4 @@ class Movie {
     public function formattedOpeningCrawl() {
         return nl2br($this->opening_crawl); // Converte as quebras de linha em tags <br> para melhor manuseio.
     }
-
-    public function formatCharacterNames() {
-        $characterNames = []; // Initialize an array to store character names
-         
-        foreach ($this->characters as $url) {
-            // Fetch character details from the API
-            $characterDataJson = ApiService::fetchDataFromApi($url);
-            // Decode the JSON data
-            $characterData = json_decode($characterDataJson, true);
-            // Extract the name and add it to the array
-            if (isset($characterData['name'])) {
-                $characterNames[] = $characterData['name'];
-            }
-        }
-
-        return $characterNames;
-    }
 }
