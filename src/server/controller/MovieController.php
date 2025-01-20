@@ -18,89 +18,62 @@
             $url = 'https://swapi.py4e.com/api/films/';
             $jsonData = ApiService::fetchDataFromApi($url);
             $data = json_decode($jsonData, true);
-
+        
             $movies = [];
-
+        
             foreach ($data['results'] as $movieData) {
-                $movies[] = new Movie($movieData);
+                $episodeId = $movieData['episode_id'];
+                if (!$this->dbHandler->filmExists($episodeId)) {
+                    // Extract character names if needed (you may need an additional method to fetch character details)
+                    $characterNames = $this->fetchCharacterNames($movieData['characters']);
+                    $formattedCharacterNames = implode(", ", $characterNames);
+        
+                    // Insert the movie into the database
+                    $this->dbHandler->insertFilm($movieData, $formattedCharacterNames);
+                }
+        
+                // Fetch movie from the database and create a Movie object
+                $movieDataFromDb = $this->dbHandler->getFilmByEpisodeId($episodeId);
+                $movies[] = new Movie($movieDataFromDb);
             }
-
+        
+            // Sort movies by release date
             usort($movies, function ($a, $b) {
                 $dateA = new \DateTime($a->release_date);
                 $dateB = new \DateTime($b->release_date);
-            
-                return $dateA <=> $dateB; // Compare dates in ascending order
+        
+                return $dateA <=> $dateB;
             });
-
+        
             include_once __DIR__ . '/../view/catalogs.php';
         }
-            /*$moviesData = $this->dbHandler->getAllFilms();
-
-            if(empty($moviesData)) {
-                $moviesData = [];
-
-                $url = 'https://swapi.py4e.com/api/films/';
+        
+        private function fetchCharacterNames($characterUrls) {
+            $characterNames = [];
+            foreach ($characterUrls as $url) {
                 $jsonData = ApiService::fetchDataFromApi($url);
                 $data = json_decode($jsonData, true);
-
-                foreach($data['results'] as $movieData) {
-                    $this->dbHandler->insertFilm($movieData);
-                    $moviesData[] = $movieData;
-                }
+                $characterNames[] = $data['name'];
             }
-
-            $movies = array_map(function ($movieData) {
-                return new Movie($movieData);
-            }, $moviesData);
-
-            usort($movies, function ($a, $b) {
-                $dateA = new \DateTime($a->release_date);
-                $dateB = new \DateTime($b->release_date);
-            
-                return $dateA <=> $dateB; // Compare dates in ascending order
-            });
-
-            include_once __DIR__ . '/../view/catalogs.php';*/
-        
-
-        
-            // Use the database handler to fetch the film details by episode ID
-            //$dbHandler = new DataBaseHandler('localhost', 'starwarsdb', 'root', ''); // Replace with your actual database credentials
-            //$filmData = $dbHandler->getFilmByEpisodeId($id);
-
-        public function showDetails($id) {
-            $url = "https://swapi.py4e.com/api/films/$id/";
-            $jsonData = ApiService::fetchDataFromApi($url);
-            $data = json_decode($jsonData, true);
-    
-            $movie = new Movie($data);
-    
-            include __DIR__ . '/../view/details.php';
+            return $characterNames;
         }
 
-            /*if (!$filmData) {
-                // If the film is not in the database, fetch it from the API, save it to the database, and then fetch it again
-                $url = "https://swapi.py4e.com/api/films/$id/";
-                $jsonData = ApiService::fetchDataFromApi($url);
-                $data = json_decode($jsonData, true);
+        public function showDetails($id) {
+            // Incrementa as visualizações no banco de dados
+            $this->dbHandler->incrementFilmViewCount($id);
+            // Busca os dados do filme a partir do banco de dados
+            $movieData = $this->dbHandler->getFilmByEpisodeId($id);
+        
+            if (!$movieData) {
+                echo "Filme não encontrado no banco de dados.";
+                return;
+            }
 
-                if ($data) {
-                    $movie = new Movie($data);
-            
-                    // Format the character names
-                    $formattedCharacterNames = $movie->formatCharacterNames();
-
-                    // Save the film to the database
-                    $dbHandler->insertFilm($data, $formattedCharacterNames);
-
-                    // Fetch the film from the database after insertion
-                    $filmData = $dbHandler->getFilmByEpisodeId($id);
-                }
-            } else{
-                // Create a Movie object using the database data
-                $movie = new Movie($filmData);
-
-                // Pass it to the view
-                include __DIR__ . '/../view/details.php';
-            }*/
+            // Cria uma instância do objeto Movie com os dados do banco
+            $movie = new Movie($movieData);
+            // Obtém a contagem de visualizações do filme
+            $viewCount = $this->dbHandler->getFilmViewCount($id);
+            // Inclui a view de detalhes
+            include __DIR__ . '/../view/details.php';
+        }
     }

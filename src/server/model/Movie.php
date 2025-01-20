@@ -12,7 +12,7 @@ class Movie {
     public $opening_crawl;
     public $release_date;
     public $director;
-    public $producers;
+    public $producer;
     public $characters;
 
     public function __construct($data) {
@@ -21,8 +21,8 @@ class Movie {
         $this->opening_crawl = $data['opening_crawl'];
         $this->release_date = $data['release_date'];
         $this->director = $data['director'];
-        $this->producers = explode(', ' , $data['producer']);
-        $this->characters = $data['characters'];
+        $this->producer = explode(', ' , $data['producer']);
+        $this->characters = isset($data['characters']) ? explode(', ', $data['characters']) : [];
     }
 
     public function calculateAge() {
