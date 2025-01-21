@@ -14,6 +14,7 @@ class Movie {
     public $director;
     public $producer;
     public $characters;
+    public $poster_url;
 
     public function __construct($data) {
         $this->title = $data['title'];
@@ -23,6 +24,7 @@ class Movie {
         $this->director = $data['director'];
         $this->producer = explode(', ' , $data['producer']);
         $this->characters = isset($data['characters']) ? explode(', ', $data['characters']) : [];
+        $this->poster_url = $data['poster_url'];
     }
 
     public function calculateAge() {
@@ -39,6 +41,6 @@ class Movie {
     }
 
     public function formattedOpeningCrawl() {
-        return nl2br($this->opening_crawl); // Converte as quebras de linha em tags <br> para melhor manuseio.
+        return nl2br($this->opening_crawl); // Converte as quebras de linha em tags <br> para melhor manuseio
     }
 }

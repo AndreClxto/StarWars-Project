@@ -24,30 +24,34 @@
             foreach ($data['results'] as $movieData) {
                 $episodeId = $movieData['episode_id'];
                 if (!$this->dbHandler->filmExists($episodeId)) {
-                    // Extract character names if needed (you may need an additional method to fetch character details)
+                    // Extrai a lista de nomes de personagens da api pelo método: fetchCharacterNames()
                     $characterNames = $this->fetchCharacterNames($movieData['characters']);
+                    // Transforma o filme em uma string cujos elementos (nomes de personagens), são separados por vírgulas
                     $formattedCharacterNames = implode(", ", $characterNames);
         
-                    // Insert the movie into the database
+                    // Insere o filme com suas informações na base de dados
                     $this->dbHandler->insertFilm($movieData, $formattedCharacterNames);
                 }
         
-                // Fetch movie from the database and create a Movie object
+                // Puxa o filme da base de dados
                 $movieDataFromDb = $this->dbHandler->getFilmByEpisodeId($episodeId);
+                // Cria um objeto Movie com as informações coletadas
                 $movies[] = new Movie($movieDataFromDb);
             }
         
-            // Sort movies by release date
+            // Organiza os filmes por data de lançamento
             usort($movies, function ($a, $b) {
                 $dateA = new \DateTime($a->release_date);
                 $dateB = new \DateTime($b->release_date);
         
                 return $dateA <=> $dateB;
             });
-        
+            
+            // Inclui a página de catálogo
             include_once __DIR__ . '/../view/catalogs.php';
         }
         
+        // O método abaixo obtém os nomes dos personagens que estão em forma de url e os adiciona para uma lista characterNames com nomes legíveis
         private function fetchCharacterNames($characterUrls) {
             $characterNames = [];
             foreach ($characterUrls as $url) {
@@ -59,7 +63,7 @@
         }
 
         public function showDetails($id) {
-            // Incrementa as visualizações no banco de dados
+            // Incrementa o número de visualizações no banco de dados
             $this->dbHandler->incrementFilmViewCount($id);
             // Busca os dados do filme a partir do banco de dados
             $movieData = $this->dbHandler->getFilmByEpisodeId($id);
@@ -73,7 +77,7 @@
             $movie = new Movie($movieData);
             // Obtém a contagem de visualizações do filme
             $viewCount = $this->dbHandler->getFilmViewCount($id);
-            // Inclui a view de detalhes
+            // Inclui a página de detalhes dos filmes
             include __DIR__ . '/../view/details.php';
         }
     }
