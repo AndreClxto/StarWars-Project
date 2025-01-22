@@ -2,45 +2,58 @@
 
 namespace Models;
 
+// Importação de classes necessárias
 use Services\ApiService;
 use Services\DataBaseHandler;
 use DateTime;
 
 class Movie {
-    public $title;
-    public $episode_id;
-    public $opening_crawl;
-    public $release_date;
-    public $director;
-    public $producer;
-    public $characters;
-    public $poster_url;
+    // Propriedades públicas que representam os atributos de um filme
+    public $title;           // Título do filme
+    public $episode_id;      // ID do episódio (número do filme)
+    public $opening_crawl;   // Sinópse (rolagem inicial dos filmes Star Wars)
+    public $release_date;    // Data de lançamento
+    public $director;        // Diretor do filme
+    public $producer;        // Produtores (armazenados como array)
+    public $characters;      // Lista de personagens (armazenada como array)
+    public $poster_url;      // URL do pôster do filme
 
     public function __construct($data) {
-        $this->title = $data['title'];
-        $this->episode_id = $data['episode_id'];
-        $this->opening_crawl = $data['opening_crawl'];
-        $this->release_date = $data['release_date'];
-        $this->director = $data['director'];
-        $this->producer = explode(', ' , $data['producer']);
-        $this->characters = isset($data['characters']) ? explode(', ', $data['characters']) : [];
-        $this->poster_url = $data['poster_url'];
+        // Inicializa as propriedades com os dados recebidos
+        $this->title = $data['title']; // Título do filme
+        $this->episode_id = $data['episode_id']; // Número do episódio
+        $this->opening_crawl = $data['opening_crawl']; // Sinópse
+        $this->release_date = $data['release_date']; // Data de lançamento
+        $this->director = $data['director']; // Nome do diretor
+
+        // Divide os nomes dos produtores em um array, separados por vírgulas
+        $this->producer = explode(', ', $data['producer']); 
+        
+        // Divide os nomes dos personagens em um array
+        $this->characters = explode(', ', $data['characters']); 
+        
+        $this->poster_url = $data['poster_url']; // URL do pôster
     }
 
+    // Método para calcular a idade do filme (em dias, meses e anos) com base na data de lançamento
     public function calculateAge() {
-        $releaseDate = new DateTime($this->release_date); 
-        $now = new DateTime();
-        $interval = $releaseDate -> diff($now);
-        $formattedDate = $releaseDate->format('d/m/Y');
+        $releaseDate = new DateTime($this->release_date); // Converte a data de lançamento em um objeto DateTime
+        $now = new DateTime(); // Data atual
+        $interval = $releaseDate->diff($now); // Calcula a diferença entre a data de lançamento e a atual
+
+        // Retorna a idade do filme em anos, meses, dias e uma data formatada
+        $formattedDate = $releaseDate->format('d/m/Y'); // Formata a data no padrão brasileiro
         return [
-            'formatted_date' => $formattedDate,
-            'days' => $interval->d,
-            'months' => $interval->m,
-            'years' => $interval->y
+            'formatted_date' => $formattedDate, // Data formatada para o padrão brasileiro
+            'days' => $interval->d,             // Dias de diferença
+            'months' => $interval->m,           // Meses de diferença
+            'years' => $interval->y             // Anos de diferença
         ];
     }
 
+    // Método para formatar o sinópse (opening crawl)
     public function formattedOpeningCrawl() {
-        return nl2br($this->opening_crawl); // Converte as quebras de linha em tags <br> para melhor manuseio
+        // Substitui as quebras de linha por tags <br> para exibição em HTML
+        return nl2br($this->opening_crawl);
     }
 }

@@ -1,83 +1,89 @@
 <?php
-    namespace Controllers;
+namespace Controllers;
 
-    use Models\Movie;
-    use Services\ApiService;
-    use Services\DataBaseHandler;
+// Importação das classes necessárias
+use Models\Movie;
+use Services\ApiService;
+use Services\DataBaseHandler;
 
-    require_once __DIR__ . '/../services/DataBaseHandler.php';
+require_once __DIR__ . '/../services/DataBaseHandler.php';
 
-    class MovieController {
-        private $dbHandler;
+class MovieController {
+    private $dbHandler;
 
-        public function __construct() {
-            $this->dbHandler = new DataBaseHandler('localhost', 'starwarsdb', 'root', '');
+    public function __construct() {
+        // Inicializa o objeto que manipula o banco de dados com os parâmetros de conexão
+        $this->dbHandler = new DataBaseHandler('localhost', 'starwarsdb', 'root', '');
+    }
+
+    public function showCatalog() {
+        // URL da API que retorna uma lista de filmes com diversas informações
+        $url = 'https://swapi.py4e.com/api/films/';
+        // Faz a requisição à API e decodifica o JSON em um array associativo
+        $jsonData = ApiService::fetchDataFromApi($url);
+        $data = json_decode($jsonData, true);
+    
+        $movies = []; // Array para armazenar os objetos de filmes
+    
+        foreach ($data['results'] as $movieData) {
+            $episodeId = $movieData['episode_id']; // ID do episódio
+            
+            // Verifica se o filme já existe no banco de dados
+            if (!$this->dbHandler->filmExists($episodeId)) {
+                // Busca os nomes dos personagens relacionados ao filme
+                $characterNames = $this->fetchCharacterNames($movieData['characters']);
+                // Formata os nomes como uma string separada por vírgulas
+                $formattedCharacterNames = implode(", ", $characterNames);
+                // Insere as informações do filme no banco de dados se elas ja não estiverem lá
+                $this->dbHandler->insertFilm($movieData, $formattedCharacterNames);
+            }
+    
+            // Obtém os dados do filme diretamente do banco de dados
+            $movieDataFromDb = $this->dbHandler->getFilmByEpisodeId($episodeId);
+            // Cria um objeto Movie com os dados retornados
+            $movies[] = new Movie($movieDataFromDb);
         }
-
-        public function showCatalog() {
-            $url = 'https://swapi.py4e.com/api/films/';
+    
+        // Ordena os filmes por data de lançamento (crescente)
+        usort($movies, function ($a, $b) {
+            $dateA = new \DateTime($a->release_date); // Converte para DateTime
+            $dateB = new \DateTime($b->release_date);
+            return $dateA <=> $dateB; // Compara as datas
+        });
+        
+        // Inclui a página de visualização do catálogo
+        include_once __DIR__ . '/../view/catalogs.php';
+    }
+    
+    // Método para traduzir os nomes dos personagens a partir das URLs fornecidas para um formato legível
+    private function fetchCharacterNames($characterUrls) {
+        $characterNames = []; // Array para armazenar os nomes dos personagens
+        foreach ($characterUrls as $url) {
+            // Faz a requisição para cada URL de personagem
             $jsonData = ApiService::fetchDataFromApi($url);
             $data = json_decode($jsonData, true);
-        
-            $movies = [];
-        
-            foreach ($data['results'] as $movieData) {
-                $episodeId = $movieData['episode_id'];
-                if (!$this->dbHandler->filmExists($episodeId)) {
-                    // Extrai a lista de nomes de personagens da api pelo método: fetchCharacterNames()
-                    $characterNames = $this->fetchCharacterNames($movieData['characters']);
-                    // Transforma o filme em uma string cujos elementos (nomes de personagens), são separados por vírgulas
-                    $formattedCharacterNames = implode(", ", $characterNames);
-        
-                    // Insere o filme com suas informações na base de dados
-                    $this->dbHandler->insertFilm($movieData, $formattedCharacterNames);
-                }
-        
-                // Puxa o filme da base de dados
-                $movieDataFromDb = $this->dbHandler->getFilmByEpisodeId($episodeId);
-                // Cria um objeto Movie com as informações coletadas
-                $movies[] = new Movie($movieDataFromDb);
-            }
-        
-            // Organiza os filmes por data de lançamento
-            usort($movies, function ($a, $b) {
-                $dateA = new \DateTime($a->release_date);
-                $dateB = new \DateTime($b->release_date);
-        
-                return $dateA <=> $dateB;
-            });
-            
-            // Inclui a página de catálogo
-            include_once __DIR__ . '/../view/catalogs.php';
+            $characterNames[] = $data['name']; // Adiciona o nome do personagem ao array
         }
-        
-        // O método abaixo obtém os nomes dos personagens que estão em forma de url e os adiciona para uma lista characterNames com nomes legíveis
-        private function fetchCharacterNames($characterUrls) {
-            $characterNames = [];
-            foreach ($characterUrls as $url) {
-                $jsonData = ApiService::fetchDataFromApi($url);
-                $data = json_decode($jsonData, true);
-                $characterNames[] = $data['name'];
-            }
-            return $characterNames;
-        }
-
-        public function showDetails($id) {
-            // Incrementa o número de visualizações no banco de dados
-            $this->dbHandler->incrementFilmViewCount($id);
-            // Busca os dados do filme a partir do banco de dados
-            $movieData = $this->dbHandler->getFilmByEpisodeId($id);
-        
-            if (!$movieData) {
-                echo "Filme não encontrado no banco de dados.";
-                return;
-            }
-
-            // Cria uma instância do objeto Movie com os dados do banco
-            $movie = new Movie($movieData);
-            // Obtém a contagem de visualizações do filme
-            $viewCount = $this->dbHandler->getFilmViewCount($id);
-            // Inclui a página de detalhes dos filmes
-            include __DIR__ . '/../view/details.php';
-        }
+        return $characterNames; // Retorna a lista de nomes
     }
+
+    public function showDetails($id) {
+        // Incrementa o contador de visualizações do filme no banco de dados
+        $this->dbHandler->incrementFilmViewCount($id);
+        // Busca os dados do filme pelo ID do episódio
+        $movieData = $this->dbHandler->getFilmByEpisodeId($id);
+    
+        // Verifica se o filme foi encontrado no banco de dados
+        if (!$movieData) {
+            echo "Filme não encontrado no banco de dados."; // Mensagem de erro
+            return;
+        }
+
+        // Cria uma instância do objeto Movie com os dados do banco
+        $movie = new Movie($movieData);
+        // Obtém o número de visualizações do filme
+        $viewCount = $this->dbHandler->getFilmViewCount($id);
+        // Inclui a página de visualização de detalhes dos filmes
+        include __DIR__ . '/../view/details.php';
+    }
+}
