@@ -16,7 +16,6 @@ class Movie {
     public $director;        // Diretor do filme
     public $producer;        // Produtores (armazenados como array)
     public $characters;      // Lista de personagens (armazenada como array)
-    public $poster_url;      // URL do pôster do filme
 
     public function __construct($data) {
         // Inicializa as propriedades com os dados recebidos
@@ -30,9 +29,7 @@ class Movie {
         $this->producer = explode(', ', $data['producer']); 
         
         // Divide os nomes dos personagens em um array
-        $this->characters = explode(', ', $data['characters']); 
-        
-        $this->poster_url = $data['poster_url']; // URL do pôster
+        $this->characters = explode(', ', $data['characters']);
     }
 
     // Método para calcular a idade do filme (em dias, meses e anos) com base na data de lançamento

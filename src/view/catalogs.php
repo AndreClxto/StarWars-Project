@@ -29,8 +29,7 @@
                     <!-- Cada item da lista representa um filme -->
                     <a href="index.php?action=details&id=<?= $movie->episode_id; ?>" class="text-decoration-none">
                         <!-- Link para a página de detalhes do filme -->
-                        <img src="<?= $movie->poster_url; ?>" alt="<?= $movie->title; ?> Poster" 
-                             class="movie-poster" style="width: 50px; height: 75px;">
+                        <img src="/starwars_project/src/assets/images/episode<?= $movie->episode_id; ?>.jpg" alt="<?= $movie->title; ?> Poster" style="width: 50px; height: 75px;">
                         <!-- Imagem do pôster do filme com dimensões fixas -->
                         <?= $movie->title; ?> (<?= $movie->calculateAge()['formatted_date']; ?>)
                         <!-- Exibe o título do filme e sua data de lançamento formatada -->

@@ -11,6 +11,17 @@ require_once __DIR__ . '/../services/DataBaseHandler.php';
 class MovieController {
     private $dbHandler;
 
+    // Array para os URLs dos pôsteres
+    private $posterUrls = [
+        1 => 'assets/images/episode1.jpg',
+        2 => 'assets/images/episode2.jpg',
+        3 => 'assets/images/episode3.jpg',
+        4 => 'assets/images/episode4.jpg',
+        5 => 'assets/images/episode5.jpg',
+        6 => 'assets/images/episode6.jpg',
+        7 => 'assets/images/episode7.jpg'
+    ];
+
     public function __construct() {
         // Inicializa o objeto que manipula o banco de dados com os parâmetros de conexão
         $this->dbHandler = new DataBaseHandler('localhost', 'starwarsdb', 'root', '');
@@ -83,6 +94,8 @@ class MovieController {
         $movie = new Movie($movieData);
         // Obtém o número de visualizações do filme
         $viewCount = $this->dbHandler->getFilmViewCount($id);
+        // A URL do poster também será passada para o template de detalhes
+        $posterUrl = $this->posterUrls[$id] ?? ''; // Pegando a URL da imagem para o poster
         // Inclui a página de visualização de detalhes dos filmes
         include __DIR__ . '/../view/details.php';
     }

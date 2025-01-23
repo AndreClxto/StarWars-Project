@@ -19,7 +19,7 @@
         <h1 class="mb-3"><?= $movie->title; ?> (Episódio <?= $movie->episode_id; ?>)</h1>
 
         <!-- Exibição do pôster do filme -->
-        <img src="<?= $movie->poster_url; ?>" alt="<?= $movie->title; ?> Poster" class="movie-details-poster">
+        <img src="<?= $posterUrl; ?>" alt="<?= $movie->title; ?> Poster" class="movie-details-poster">
         
         <!-- Sinopse do filme -->
         <p><strong>Sinópse:</strong></p>
