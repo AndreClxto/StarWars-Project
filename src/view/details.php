@@ -10,7 +10,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 
     <!-- Importação de estilos personalizados -->
-    <link rel="stylesheet" href="/starwars_project/src/assets/css/styles.css">
+    <link rel="stylesheet" href="/Starwars_Project/src/assets/css/styles.css">
 </head>
 <body class="text-dark"> <!-- Define a cor do texto como escura -->
 
